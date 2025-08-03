@@ -1,20 +1,24 @@
 
+import { db } from '../db';
+import { ordersTable } from '../db/schema';
 import { type Order } from '../schema';
+import { eq, desc } from 'drizzle-orm';
 
 export const getUserOrders = async (userId: number): Promise<Order[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to fetch all orders for a specific user
-  // with related order items and product information.
-  return Promise.resolve([
-    {
-      id: 1,
-      user_id: userId,
-      total_amount: 8500.00,
-      status: 'delivered',
-      shipping_address: '123 Main St',
-      billing_address: '123 Main St',
-      created_at: new Date(),
-      updated_at: new Date()
-    }
-  ] as Order[]);
+  try {
+    const results = await db.select()
+      .from(ordersTable)
+      .where(eq(ordersTable.user_id, userId))
+      .orderBy(desc(ordersTable.created_at))
+      .execute();
+
+    // Convert numeric fields back to numbers
+    return results.map(order => ({
+      ...order,
+      total_amount: parseFloat(order.total_amount)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch user orders:', error);
+    throw error;
+  }
 };

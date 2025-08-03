@@ -1,17 +1,19 @@
 
+import { db } from '../db';
+import { cartItemsTable } from '../db/schema';
 import { type CartItem } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const getCartItems = async (userId: number): Promise<CartItem[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to fetch all items in user's shopping cart
-  // with related product information for display.
-  return Promise.resolve([
-    {
-      id: 1,
-      user_id: userId,
-      product_id: 1,
-      quantity: 2,
-      added_at: new Date()
-    }
-  ] as CartItem[]);
+  try {
+    const results = await db.select()
+      .from(cartItemsTable)
+      .where(eq(cartItemsTable.user_id, userId))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get cart items:', error);
+    throw error;
+  }
 };

@@ -1,15 +1,25 @@
 
+import { db } from '../db';
+import { categoriesTable } from '../db/schema';
 import { type CreateCategoryInput, type Category } from '../schema';
 
 export const createCategory = async (input: CreateCategoryInput): Promise<Category> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to create a new watch category in the database.
-  // This should be admin-only functionality.
-  return Promise.resolve({
-    id: 1,
-    name: input.name,
-    description: input.description || null,
-    image_url: input.image_url || null,
-    created_at: new Date()
-  } as Category);
+  try {
+    // Insert category record
+    const result = await db.insert(categoriesTable)
+      .values({
+        name: input.name,
+        description: input.description || null,
+        image_url: input.image_url || null
+      })
+      .returning()
+      .execute();
+
+    // Return the created category
+    const category = result[0];
+    return category;
+  } catch (error) {
+    console.error('Category creation failed:', error);
+    throw error;
+  }
 };

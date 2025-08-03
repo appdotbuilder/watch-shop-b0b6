@@ -1,18 +1,23 @@
 
+import { db } from '../db';
+import { reviewsTable } from '../db/schema';
 import { type Review } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const getProductReviews = async (productId: number): Promise<Review[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to fetch all reviews for a specific product
-  // with user information for display.
-  return Promise.resolve([
-    {
-      id: 1,
-      user_id: 1,
-      product_id: productId,
-      rating: 5,
-      comment: 'Excellent watch, highly recommend!',
-      created_at: new Date()
-    }
-  ] as Review[]);
+  try {
+    const results = await db.select()
+      .from(reviewsTable)
+      .where(eq(reviewsTable.product_id, productId))
+      .execute();
+
+    return results.map(review => ({
+      ...review,
+      // No numeric conversions needed - all fields are already correct types
+      // rating is integer, others are already proper types
+    }));
+  } catch (error) {
+    console.error('Failed to fetch product reviews:', error);
+    throw error;
+  }
 };

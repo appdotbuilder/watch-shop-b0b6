@@ -1,16 +1,19 @@
 
+import { db } from '../db';
+import { wishlistItemsTable } from '../db/schema';
 import { type WishlistItem } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const getWishlistItems = async (userId: number): Promise<WishlistItem[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to fetch all items in user's wishlist
-  // with related product information for display.
-  return Promise.resolve([
-    {
-      id: 1,
-      user_id: userId,
-      product_id: 1,
-      added_at: new Date()
-    }
-  ] as WishlistItem[]);
+  try {
+    const results = await db.select()
+      .from(wishlistItemsTable)
+      .where(eq(wishlistItemsTable.user_id, userId))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get wishlist items:', error);
+    throw error;
+  }
 };

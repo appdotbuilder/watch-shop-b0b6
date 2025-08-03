@@ -1,24 +1,17 @@
 
+import { db } from '../db';
+import { categoriesTable } from '../db/schema';
 import { type Category } from '../schema';
 
 export const getCategories = async (): Promise<Category[]> => {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is to fetch all watch categories from the database
-  // for use in navigation and product filtering.
-  return Promise.resolve([
-    {
-      id: 1,
-      name: 'Luxury Watches',
-      description: 'Premium and luxury timepieces',
-      image_url: 'https://example.com/luxury.jpg',
-      created_at: new Date()
-    },
-    {
-      id: 2,
-      name: 'Sport Watches',
-      description: 'Durable watches for active lifestyles',
-      image_url: 'https://example.com/sport.jpg',
-      created_at: new Date()
-    }
-  ] as Category[]);
+  try {
+    const results = await db.select()
+      .from(categoriesTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+    throw error;
+  }
 };
